@@ -27,10 +27,12 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.example.ui.theme.GarvisAmber
-import com.example.ui.theme.GarvisCyan
-import com.example.ui.theme.GarvisCyanGlow
-import com.example.ui.theme.GarvisCyanSoft
+import com.example.ui.theme.GarvisGold
+import com.example.ui.theme.GarvisRed
+import com.example.ui.theme.GarvisRedBright
+import com.example.ui.theme.GarvisRedDark
+import com.example.ui.theme.GarvisRedGlow
+import com.example.ui.theme.GarvisRedSoft
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -55,9 +57,9 @@ fun ArcReactorView(
   // Outer ring rotation speed depending on state
   val outerRotationDuration = when (status) {
     GarvisStatus.PROCESSING -> 3000
-    GarvisStatus.LISTENING -> 5000
-    GarvisStatus.SPEAKING -> 6000
-    else -> 12000
+    GarvisStatus.LISTENING -> 4500
+    GarvisStatus.SPEAKING -> 5500
+    else -> 11000
   }
   val outerRotation = infiniteTransition.animateFloat(
     initialValue = 0f,
@@ -71,10 +73,10 @@ fun ArcReactorView(
 
   // Inner ring counter-rotation
   val innerRotationDuration = when (status) {
-    GarvisStatus.PROCESSING -> 2000
-    GarvisStatus.LISTENING -> 4000
-    GarvisStatus.SPEAKING -> 4500
-    else -> 9000
+    GarvisStatus.PROCESSING -> 1800
+    GarvisStatus.LISTENING -> 3500
+    GarvisStatus.SPEAKING -> 4000
+    else -> 8000
   }
   val innerRotation = infiniteTransition.animateFloat(
     initialValue = 360f,
@@ -88,14 +90,14 @@ fun ArcReactorView(
 
   // Pulsing glow animation
   val pulseDuration = when (status) {
-    GarvisStatus.SPEAKING -> 800
-    GarvisStatus.PROCESSING -> 600
-    GarvisStatus.LISTENING -> 1000
-    else -> 2200
+    GarvisStatus.SPEAKING -> 750
+    GarvisStatus.PROCESSING -> 500
+    GarvisStatus.LISTENING -> 900
+    else -> 2000
   }
   val pulse = infiniteTransition.animateFloat(
     initialValue = 0.85f,
-    targetValue = 1.15f,
+    targetValue = 1.18f,
     animationSpec = infiniteRepeatable(
       animation = tween(pulseDuration, easing = FastOutSlowInEasing),
       repeatMode = RepeatMode.Reverse
@@ -105,10 +107,10 @@ fun ArcReactorView(
 
   // Energy flux jitter for processing/speaking
   val fluxJitter = infiniteTransition.animateFloat(
-    initialValue = 0.9f,
-    targetValue = 1.1f,
+    initialValue = 0.92f,
+    targetValue = 1.08f,
     animationSpec = infiniteRepeatable(
-      animation = tween(120, easing = LinearEasing),
+      animation = tween(110, easing = LinearEasing),
       repeatMode = RepeatMode.Reverse
     ),
     label = "fluxJitter"
@@ -131,37 +133,37 @@ fun ArcReactorView(
 
       // Audio reactivity boost
       val audioBoost = if (status == GarvisStatus.LISTENING || status == GarvisStatus.SPEAKING) {
-        rmsAudioLevel * 0.35f
+        rmsAudioLevel * 0.4f
       } else {
         0f
       }
 
       val effectivePulse = (pulse.value + audioBoost) * if (status == GarvisStatus.PROCESSING) fluxJitter.value else 1f
 
-      // 1. Outermost Radial Background Glow
+      // 1. Outermost Radial Background Glow (Blazing Crimson Red / Gold)
       val glowColor = when (status) {
-        GarvisStatus.LISTENING -> GarvisCyan
-        GarvisStatus.PROCESSING -> GarvisAmber
-        GarvisStatus.SPEAKING -> GarvisCyanSoft
-        else -> GarvisCyan
+        GarvisStatus.LISTENING -> GarvisRedBright
+        GarvisStatus.PROCESSING -> GarvisGold
+        GarvisStatus.SPEAKING -> GarvisRed
+        else -> GarvisRed
       }
       drawCircle(
         brush = Brush.radialGradient(
           colors = listOf(
-            glowColor.copy(alpha = 0.35f * effectivePulse.coerceIn(0.6f, 1.4f)),
-            glowColor.copy(alpha = 0.12f),
+            glowColor.copy(alpha = 0.42f * effectivePulse.coerceIn(0.6f, 1.4f)),
+            glowColor.copy(alpha = 0.15f),
             Color.Transparent
           ),
           center = center,
-          radius = radius * 1.25f
+          radius = radius * 1.3f
         ),
-        radius = radius * 1.25f,
+        radius = radius * 1.3f,
         center = center
       )
 
-      // 2. Outermost Calibration Ring with Tick Marks
+      // 2. Outermost Calibration Ring with Red & Gold Tick Marks
       drawCircle(
-        color = GarvisCyan.copy(alpha = 0.25f),
+        color = GarvisRed.copy(alpha = 0.35f),
         radius = radius * 0.98f,
         center = center,
         style = Stroke(width = 1.5.dp.toPx())
@@ -172,14 +174,14 @@ fun ArcReactorView(
         tickCount = 36,
         tickLength = 5.dp.toPx(),
         strokeWidth = 1.dp.toPx(),
-        color = GarvisCyan.copy(alpha = 0.4f)
+        color = GarvisGold.copy(alpha = 0.55f)
       )
 
       // 3. Rotating Outer Segmented Stator Housing
       rotate(outerRotation.value, pivot = center) {
         // Outer stator boundary
         drawCircle(
-          color = GarvisCyan.copy(alpha = 0.6f),
+          color = GarvisRed.copy(alpha = 0.75f),
           radius = radius * 0.85f,
           center = center,
           style = Stroke(width = 2.dp.toPx())
@@ -200,15 +202,16 @@ fun ArcReactorView(
           )
 
           rotate(angleDeg + 90f, pivot = coilCenter) {
-            // Inductor block
+            // Inductor block in Red / Gold
+            val blockColor = if (i % 2 == 0) GarvisRed else GarvisGold
             drawRect(
-              color = if (status == GarvisStatus.PROCESSING && i % 2 == 0) GarvisAmber else GarvisCyan,
+              color = blockColor,
               topLeft = Offset(coilCenter.x - coilWidth / 2f, coilCenter.y - coilHeight / 2f),
               size = androidx.compose.ui.geometry.Size(coilWidth, coilHeight)
             )
             // Inner wire wrap line
             drawLine(
-              color = Color.White.copy(alpha = 0.9f),
+              color = Color.White.copy(alpha = 0.95f),
               start = Offset(coilCenter.x - coilWidth / 2f, coilCenter.y),
               end = Offset(coilCenter.x + coilWidth / 2f, coilCenter.y),
               strokeWidth = 2.dp.toPx()
@@ -220,7 +223,7 @@ fun ArcReactorView(
       // 4. Middle Counter-Rotating Track
       rotate(innerRotation.value, pivot = center) {
         drawCircle(
-          color = GarvisCyan.copy(alpha = 0.5f),
+          color = GarvisGold.copy(alpha = 0.65f),
           radius = radius * 0.62f,
           center = center,
           style = Stroke(
@@ -235,46 +238,46 @@ fun ArcReactorView(
           tickCount = 20,
           tickLength = 6.dp.toPx(),
           strokeWidth = 1.5.dp.toPx(),
-          color = GarvisCyan.copy(alpha = 0.7f)
+          color = GarvisRed.copy(alpha = 0.8f)
         )
       }
 
-      // 5. Stationary Crosshair Radians
+      // 5. Stationary Crosshairs
       val crossLen = radius * 0.72f
       drawLine(
-        color = GarvisCyan.copy(alpha = 0.35f),
+        color = GarvisRed.copy(alpha = 0.4f),
         start = Offset(center.x - crossLen, center.y),
         end = Offset(center.x - radius * 0.45f, center.y),
         strokeWidth = 1.dp.toPx()
       )
       drawLine(
-        color = GarvisCyan.copy(alpha = 0.35f),
+        color = GarvisRed.copy(alpha = 0.4f),
         start = Offset(center.x + radius * 0.45f, center.y),
         end = Offset(center.x + crossLen, center.y),
         strokeWidth = 1.dp.toPx()
       )
       drawLine(
-        color = GarvisCyan.copy(alpha = 0.35f),
+        color = GarvisRed.copy(alpha = 0.4f),
         start = Offset(center.x, center.y - crossLen),
         end = Offset(center.x, center.y - radius * 0.45f),
         strokeWidth = 1.dp.toPx()
       )
       drawLine(
-        color = GarvisCyan.copy(alpha = 0.35f),
+        color = GarvisRed.copy(alpha = 0.4f),
         start = Offset(center.x, center.y + radius * 0.45f),
         end = Offset(center.x, center.y + crossLen),
         strokeWidth = 1.dp.toPx()
       )
 
-      // 6. Inner Core Housing Ring with intense pulse
+      // 6. Inner Core Housing Ring with intense Crimson Red Pulse
       val coreRadius = radius * 0.42f * effectivePulse.coerceIn(0.85f, 1.25f)
       drawCircle(
         brush = Brush.radialGradient(
           colors = listOf(
             Color.White,
-            GarvisCyanSoft,
-            GarvisCyan,
-            GarvisCyanGlow
+            GarvisRedSoft,
+            GarvisRed,
+            GarvisRedDark
           ),
           center = center,
           radius = coreRadius
@@ -283,7 +286,7 @@ fun ArcReactorView(
         center = center
       )
 
-      // 7. Vibranium Triangular / Hexagonal Core Structure
+      // 7. Nanotech Triangular Core Structure
       rotate(-outerRotation.value * 0.5f, pivot = center) {
         val triRadius = coreRadius * 0.68f
         val trianglePath = Path().apply {
@@ -306,16 +309,16 @@ fun ArcReactorView(
         }
         drawPath(
           path = trianglePath,
-          color = Color(0xFF0A0E17).copy(alpha = 0.85f)
+          color = Color(0xFF14070A).copy(alpha = 0.88f)
         )
         drawPath(
           path = trianglePath,
-          color = if (status == GarvisStatus.PROCESSING) GarvisAmber else GarvisCyan,
+          color = if (status == GarvisStatus.PROCESSING) GarvisGold else GarvisRedBright,
           style = Stroke(width = 2.dp.toPx())
         )
       }
 
-      // 8. Luminescent Central Core Hotspot (Blinding clean white-cyan)
+      // 8. Luminescent Central Core Hotspot (Blinding clean hot white)
       drawCircle(
         color = Color.White,
         radius = coreRadius * 0.28f,

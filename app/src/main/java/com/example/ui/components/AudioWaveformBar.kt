@@ -20,10 +20,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.ui.theme.GarvisAmber
-import com.example.ui.theme.GarvisCyan
+import com.example.ui.theme.GarvisGold
+import com.example.ui.theme.GarvisRed
+import com.example.ui.theme.GarvisRedBright
 import kotlin.math.sin
 
 @Composable
@@ -54,7 +54,6 @@ fun AudioWaveformBar(
   ) {
     for (i in 0 until barCount) {
       val normalizedIndex = i.toFloat() / barCount
-      // Wave shape
       val baseHeight = when (status) {
         GarvisStatus.LISTENING -> {
           val sineVal = (sin(phase + normalizedIndex * 4f) + 1f) / 2f
@@ -69,17 +68,16 @@ fun AudioWaveformBar(
           (4f + (sineVal * 16f)).coerceIn(4f, 24f)
         }
         else -> {
-          // Idle breathing
           val sineVal = (sin(phase * 0.5f + normalizedIndex * 3f) + 1f) / 2f
           (3f + (sineVal * 5f)).coerceIn(3f, 8f)
         }
       }
 
       val barColor = when (status) {
-        GarvisStatus.PROCESSING -> GarvisAmber
-        GarvisStatus.LISTENING -> GarvisCyan
-        GarvisStatus.SPEAKING -> GarvisCyan
-        else -> GarvisCyan.copy(alpha = 0.45f)
+        GarvisStatus.PROCESSING -> GarvisGold
+        GarvisStatus.LISTENING -> GarvisRedBright
+        GarvisStatus.SPEAKING -> GarvisRed
+        else -> GarvisRed.copy(alpha = 0.5f)
       }
 
       Box(

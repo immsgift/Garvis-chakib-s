@@ -13,27 +13,27 @@
                 android:endX="108"
                 android:endY="108"
                 android:type="linear">
-                <item android:offset="0.0" android:color="#FF080C14" />
-                <item android:offset="0.5" android:color="#FF0A1322" />
-                <item android:offset="1.0" android:color="#FF060910" />
+                <item android:offset="0.0" android:color="#FF1C080B" />
+                <item android:offset="0.5" android:color="#FF0F0507" />
+                <item android:offset="1.0" android:color="#FF080203" />
             </gradient>
         </aapt:attr>
     </path>
-    <!-- Subtle circular radar grid -->
+    <!-- Subtle circular radar grid in crimson -->
     <path
         android:fillColor="#00000000"
-        android:strokeColor="#1A00F0FF"
+        android:strokeColor="#22FF1744"
         android:strokeWidth="0.8"
         android:pathData="M54,18 A36,36 0 1,1 53.99,18" />
     <path
         android:fillColor="#00000000"
-        android:strokeColor="#1200F0FF"
+        android:strokeColor="#18FF1744"
         android:strokeWidth="0.8"
         android:pathData="M54,6 A48,48 0 1,1 53.99,6" />
     <!-- Crosshairs -->
     <path
         android:fillColor="#00000000"
-        android:strokeColor="#2000F0FF"
+        android:strokeColor="#28FFD700"
         android:strokeWidth="0.6"
         android:pathData="M14,54 L94,54 M54,14 L54,94" />
 </vector>

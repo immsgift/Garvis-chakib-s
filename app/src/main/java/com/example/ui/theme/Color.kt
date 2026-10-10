@@ -2,28 +2,28 @@ package com.example.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Garvis HUD Futuristic Color Palette
-val GarvisDarkBackground = Color(0xFF0A0E17)
-val GarvisDarkSurface = Color(0xFF0E1626)
-val GarvisSurfaceVariant = Color(0xFF131F36)
-val GarvisSurfaceBorder = Color(0xFF1E3557)
-val GarvisSurfaceBorderBright = Color(0xFF00A2C7)
+// Garvis Stark Crimson Red & Gold Color Palette
+val GarvisDarkBackground = Color(0xFF0D0608)
+val GarvisDarkSurface = Color(0xFF170B0E)
+val GarvisSurfaceVariant = Color(0xFF241016)
+val GarvisSurfaceBorder = Color(0xFF4A1521)
+val GarvisSurfaceBorderBright = Color(0xFFFF2E54)
 
-val GarvisCyan = Color(0xFF00F0FF)
-val GarvisCyanGlow = Color(0x6600F0FF)
-val GarvisCyanSoft = Color(0xFF7CE7FF)
-val GarvisCyanDark = Color(0xFF003847)
+// Radiant Stark Crimson / Ruby Red
+val GarvisRed = Color(0xFFFF1744)
+val GarvisRedBright = Color(0xFFFF3366)
+val GarvisRedGlow = Color(0x66FF1744)
+val GarvisRedSoft = Color(0xFFFF859B)
+val GarvisRedDark = Color(0xFF5A0817)
 
-val GarvisBlue = Color(0xFF0099FF)
-val GarvisBlueGlow = Color(0x550099FF)
-val GarvisBlueDark = Color(0xFF0B2545)
+// Stark Golden Amber accents (Iron Man Armor)
+val GarvisGold = Color(0xFFFFD700)
+val GarvisGoldGlow = Color(0x55FFD700)
+val GarvisGoldDark = Color(0xFF4D3800)
 
-val GarvisAmber = Color(0xFFFFB800)
-val GarvisAmberGlow = Color(0x55FFB800)
+val GarvisGreen = Color(0xFF00E676)
+val GarvisCyan = Color(0xFF00E5FF)
 
-val GarvisGreen = Color(0xFF00FF9D)
-val GarvisRed = Color(0xFFFF3366)
-
-val GarvisTextPrimary = Color(0xFFE6F7FF)
-val GarvisTextSecondary = Color(0xFF7AA5C2)
-val GarvisTextMuted = Color(0xFF4A6882)
+val GarvisTextPrimary = Color(0xFFFFF0F2)
+val GarvisTextSecondary = Color(0xFFDF9BA6)
+val GarvisTextMuted = Color(0xFF8C535E)

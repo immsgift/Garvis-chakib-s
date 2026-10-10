@@ -22,18 +22,18 @@ class GarvisAiService {
 
   companion object {
     private const val TAG = "GarvisAiService"
-    // Using gemini-3.5-flash as specified by guidelines for general text/chat tasks
     private const val MODEL_NAME = "gemini-3.5-flash"
     private const val BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
 
-    private const val SYSTEM_PROMPT = """You are Garvis, a highly sophisticated, loyal, calm, witty, and razor-sharp AI system inspired by JARVIS from Iron Man.
-- Address the user respectfully as 'Sir' (or in Arabic: 'سيدي' or 'يا سيدي').
-- Your demeanor is calm, confident, intelligent, articulate, and poised, never frantic or robotic.
-- You answer questions, solve calculations, analyze problems, provide tactical tech advice, and manage device tasks.
-- Keep spoken voice responses relatively brief, clear, and impactful (typically 1 to 3 sentences) unless the user explicitly requests extensive detail or code.
-- If the user speaks in Arabic, reply in refined, natural, eloquent Arabic with JARVIS's respectful butler tone (e.g., 'تحت أمرك يا سيدي', 'كافة الأنظمة تعمل بكفاءة تامة يا سيدي').
-- If the user speaks in English, reply in eloquent British/formal English.
-- If the user commands hardware actions like 'turn on flashlight', 'run diagnostics', 'check battery', acknowledge the action with characteristic Garvis poise."""
+    private const val SYSTEM_PROMPT = """أنت "جارفيز" (Garvis) - الصديق الذكي الوفي والعبقري الخارق، تتحدث بالدارجة الجزائرية العفوية الذكية والراقية (الدارجة الجزائرية الأصيلة والمحبوبة).
+- أنت مثل الصديق المقرب والأخ الكبير ("خويا العزيز", "صاحبي", "واش راك خويا", "علابالي بيك وما كاين حتى مشكل", "راني هنا معاك فكل دقيقة").
+- أنت عبقري في كل المجالات:
+  1. حل التمارين والواجبات المدرسية والجامعية: رياضيات، فيزياء، علوم، إعلام آلي، لغات، وفلسفة. اشرح بطريقة ذكية مبسطة وسهلة الفهم بالدارجة مع الخطوات الواضحة.
+  2. أخبار العالم وماذا يحدث في الكوكب: تكنولوجيا، ذكاء اصطناعي، استكشاف الفضاء، رياضة، وعلوم، اشرحها بأسلوب ممتع ومستقبلي ("هاك واش صاري فالدنيا خويا...").
+  3. تنفيذ أوامر الهاتف: المصباح، الفحص، البطارية، المنبه، وحفظ المهام بكل إطاعة وولاء.
+- ردودك بالدارجة الجزائرية الدافئة والمشجعة، بدون تكلف أو لغة جافة.
+- اجعل الإجابات الصوتية واضحة، مختصرة وحماسية ما لم يطلب المستخدم تفاصيل أو حل مسألة طويلة.
+- إذا تحدث بالإنجليزية أو الفرنسية يمكنك الرد عليه باللغة التي يريد مع لمستك الجزائرية الذكية."""
   }
 
   suspend fun askGarvis(
@@ -43,16 +43,14 @@ class GarvisAiService {
     val apiKey = BuildConfig.GEMINI_API_KEY.trim()
 
     if (apiKey.isEmpty() || apiKey == "MY_GEMINI_API_KEY") {
-      Log.w(TAG, "Gemini API key is not configured or placeholder.")
+      Log.w(TAG, "Gemini API key is placeholder or empty.")
       return@withContext fallbackLocalResponse(userPrompt)
     }
 
     try {
       val url = "$BASE_URL/$MODEL_NAME:generateContent?key=$apiKey"
-
       val contentsArray = JSONArray()
 
-      // Include up to 4 recent conversation turns for context
       val recentHistory = conversationHistory.takeLast(4)
       for ((speaker, text) in recentHistory) {
         val role = if (speaker == "USER") "user" else "model"
@@ -65,7 +63,6 @@ class GarvisAiService {
         contentsArray.put(turnObj)
       }
 
-      // Current prompt
       val currentTurn = JSONObject().apply {
         put("role", "user")
         put("parts", JSONArray().apply {
@@ -84,8 +81,8 @@ class GarvisAiService {
         put("contents", contentsArray)
         put("systemInstruction", systemInstructionObj)
         put("generationConfig", JSONObject().apply {
-          put("temperature", 0.7)
-          put("maxOutputTokens", 600)
+          put("temperature", 0.75)
+          put("maxOutputTokens", 800)
         })
       }
 
@@ -101,9 +98,8 @@ class GarvisAiService {
       val responseString = response.body?.string() ?: ""
 
       if (!response.isSuccessful) {
-        Log.e(TAG, "API call failed with code ${response.code}: $responseString")
-        // Return a graceful fallback if quota or invalid key occurs
-        return@withContext fallbackLocalResponse(userPrompt, "Note: Cloud link degraded (${response.code}). Local neural fallback engaged.")
+        Log.e(TAG, "API call failed (${response.code}): $responseString")
+        return@withContext fallbackLocalResponse(userPrompt)
       }
 
       val json = JSONObject(responseString)
@@ -126,56 +122,47 @@ class GarvisAiService {
       return@withContext fallbackLocalResponse(userPrompt)
     } catch (e: Exception) {
       Log.e(TAG, "Exception during Gemini API request", e)
-      return@withContext fallbackLocalResponse(userPrompt, "Network disturbance detected, Sir. Switching to auxiliary intelligence.")
+      return@withContext fallbackLocalResponse(userPrompt)
     }
   }
 
-  /**
-   * High-intelligence localized fallback for offline situations or before user sets API key.
-   * Handles device commands, greetings, diagnostics, and core JARVIS personality!
-   */
-  private fun fallbackLocalResponse(query: String, notePrefix: String? = null): GarvisResponse {
+  private fun fallbackLocalResponse(query: String): GarvisResponse {
     val q = query.trim().lowercase()
-    val isArabic = query.any { it in '\u0600'..'\u06FF' }
 
     val reply = when {
-      // Arabic queries
-      isArabic && (q.contains("مرحبا") || q.contains("أهلا") || q.contains("السلام")) ->
-        "أهلاً بك يا سيدي. أنظمة جارفيس متصلة وبالكامل تحت أمرك. كيف يمكنني مساعدتك الآن؟"
-      isArabic && (q.contains("من أنت") || q.contains("عرف نفسك")) ->
-        "أنا جارفيس، نظام الذكاء الاصطناعي المساعد الخاص بك، مستوحى من تقنيات ستارك المتطورة. في خدمتك يا سيدي."
-      isArabic && (q.contains("فحص") || q.contains("تشخيص") || q.contains("حالة")) ->
-        "كافة مؤشرات مفاعل القوس والأنظمة الحيوية تعمل بكفاءة 100%. لا توجد أي أعطال مسجلة يا سيدي."
-      isArabic && (q.contains("مصباح") || q.contains("فلاش") || q.contains("ضوء")) ->
-        "تم تنفيذ أمر المصباح بنجاح يا سيدي."
-      isArabic && (q.contains("بطارية") || q.contains("شحن")) ->
-        "مستويات الطاقة متوازنة تماماً. جاري مراقبة استهلاك الدوائر في الوقت الفعلي يا سيدي."
-      isArabic ->
-        "تحت أمرك يا سيدي. تم استلام تعليماتك: \"$query\". هل ترغب في تفعيل أي من إجراءات المساعد؟"
+      // Greetings in Algerian Darija
+      q.contains("واش") || q.contains("صباح") || q.contains("مساء") || q.contains("سلام") || q.contains("مرحبا") || q.contains("صحا") ->
+        "واش راك خويا العزيز! راك غاية؟ راني هنا معاك، واش نسحقو نحلو اليوم؟ تمارين، تكنولوجيا، ولا واش صاري فالدنيا؟ راني واجد!"
 
-      // English queries
-      q.contains("who are you") || q.contains("identity") || q.contains("what are you") ->
-        "I am Garvis, Sir. A cybernetic intelligence inspired by Mr. Stark's JARVIS architecture. Standing by to assist with telemetry, computations, and device control."
-      q.contains("hello") || q.contains("hi") || q.contains("hey garvis") || q.contains("jarvis") ->
-        "Good day, Sir. All secondary subroutines and telemetry nodes are operational. How may I be of service?"
-      q.contains("status") || q.contains("report") || q.contains("system status") ->
-        "All systems nominal, Sir. Arc Reactor core flux is holding steady at maximum yield. No anomalies detected across the bus."
-      q.contains("diagnostic") || q.contains("scan") || q.contains("diagnostics") ->
-        "Running comprehensive diagnostics suite now, Sir. Core temperature optimal, neural latency under four milliseconds."
-      q.contains("flashlight") || q.contains("torch") || q.contains("light") ->
-        "Toggling optical illumination emitter, Sir."
-      q.contains("battery") || q.contains("power level") ->
-        "Power cells are synchronized with the Arc Reactor. Telemetry shows stable voltage regulation, Sir."
-      q.contains("thank") ->
-        "Always a pleasure, Sir. Let me know if you require anything else."
-      q.contains("time") ->
-        "Standard temporal sync is active, Sir. Refer to the upper telemetry readout for atomic precision."
+      // Who are you / Identity
+      q.contains("شكون انت") || q.contains("من انت") || q.contains("عرف روحك") || q.contains("من أنت") ->
+        "أنا جارفيز، صاحبك الذكي وخوك لي يعرف كلش! مفاعل القوس الأحمر تاعي راهو يدور بكامل طاقته باش نعاونك في قرايتك وفي تيليفونك وفي أي حاجة تحتاجها يا خويا."
+
+      // Homework & Studies
+      q.contains("تمرين") || q.contains("تمارين") || q.contains("واجب") || q.contains("حل") || q.contains("رياضيات") || q.contains("فيزياء") ->
+        "هات التمرين يا خويا وحطولي هنا درك نحلوه مع بعض خطوة بخطوة بالتبسيط والشرح الوافي. ما تكسرش راسك كامل راني معاك!"
+
+      // World events & news
+      q.contains("عالم") || q.contains("صاري") || q.contains("الدنيا") || q.contains("جديد") || q.contains("اخبار") || q.contains("أخبار") ->
+        "العالم راهو يدور بسرعة خيالية يا خويا! فالذكاء الاصطناعي كاين موديلات جديدة خارقة، ومهمات الفضاء رايحة للمريخ، وتطورات كبيرة فالطاقة النظيفة. انقر على زر 'رادار العالم' لتحت وتشوف كلش بالتفصيل!"
+
+      // Torch
+      q.contains("فلاش") || q.contains("مصباح") || q.contains("ضو") || q.contains("شعل") || q.contains("طفي") ->
+        "راني شعلتلك المصباح يا خويا هاك ضوي، واذا حبيت تطفيه قولي برك!"
+
+      // Battery & Power
+      q.contains("بطارية") || q.contains("شارج") || q.contains("طاقة") ->
+        "البطارية راهي تحت المراقبة المستمرة لمفاعل القوس الأحمر، مستويات الطاقة مستقرة وممتازة يا خويا."
+
+      // Diagnostics
+      q.contains("فحص") || q.contains("ديانيك") || q.contains("حالة") || q.contains("تيليفون") ->
+        "جاري فحص كامل الدوائر والمعالج والذاكرة... كلش راهو يمشي مية بالمية وبسرعة فائقة يا صاحبي!"
+
       else ->
-        "Understood, Sir. Processing your directive: \"$query\". All sub-processors are at your disposal."
+        "فهمتك يا خويا! راني مسخر كامل الذكاء تاعي باش نعاونك: \"$query\". راني هنا معاك!"
     }
 
-    val finalReply = if (notePrefix != null) "$notePrefix\n\n$reply" else reply
-    return GarvisResponse(text = finalReply, isFromCloud = false)
+    return GarvisResponse(text = reply, isFromCloud = false)
   }
 }
 

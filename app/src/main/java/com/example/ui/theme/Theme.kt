@@ -5,21 +5,21 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-private val GarvisColorScheme = darkColorScheme(
-  primary = GarvisCyan,
+private val GarvisCrimsonColorScheme = darkColorScheme(
+  primary = GarvisRed,
   onPrimary = GarvisDarkBackground,
-  primaryContainer = GarvisCyanDark,
-  onPrimaryContainer = GarvisCyanSoft,
+  primaryContainer = GarvisRedDark,
+  onPrimaryContainer = GarvisRedSoft,
 
-  secondary = GarvisBlue,
+  secondary = GarvisGold,
   onSecondary = GarvisDarkBackground,
-  secondaryContainer = GarvisBlueDark,
-  onSecondaryContainer = GarvisCyanSoft,
+  secondaryContainer = GarvisGoldDark,
+  onSecondaryContainer = GarvisGold,
 
-  tertiary = GarvisAmber,
+  tertiary = GarvisRedBright,
   onTertiary = GarvisDarkBackground,
-  tertiaryContainer = Color(0xFF332500),
-  onTertiaryContainer = GarvisAmber,
+  tertiaryContainer = GarvisRedDark,
+  onTertiaryContainer = GarvisRedSoft,
 
   background = GarvisDarkBackground,
   onBackground = GarvisTextPrimary,
@@ -31,7 +31,7 @@ private val GarvisColorScheme = darkColorScheme(
 
   outline = GarvisSurfaceBorder,
   outlineVariant = GarvisSurfaceBorderBright,
-  error = GarvisRed,
+  error = Color(0xFFFF5252),
   onError = GarvisDarkBackground
 )
 
@@ -40,7 +40,7 @@ fun GarvisTheme(
   content: @Composable () -> Unit
 ) {
   MaterialTheme(
-    colorScheme = GarvisColorScheme,
+    colorScheme = GarvisCrimsonColorScheme,
     typography = Typography,
     content = content
   )

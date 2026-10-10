@@ -9,7 +9,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -36,7 +35,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -44,10 +42,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -80,12 +76,13 @@ import com.example.ui.components.GarvisStatus
 import com.example.ui.components.HudTelemetryBar
 import com.example.ui.components.QuickActionPanel
 import com.example.ui.components.TranscriptTerminal
-import com.example.ui.theme.GarvisAmber
-import com.example.ui.theme.GarvisCyan
-import com.example.ui.theme.GarvisCyanDark
+import com.example.ui.components.WorldPulseDialog
 import com.example.ui.theme.GarvisDarkBackground
+import com.example.ui.theme.GarvisGold
 import com.example.ui.theme.GarvisGreen
 import com.example.ui.theme.GarvisRed
+import com.example.ui.theme.GarvisRedBright
+import com.example.ui.theme.GarvisRedDark
 import com.example.ui.theme.GarvisSurfaceBorder
 import com.example.ui.theme.GarvisSurfaceVariant
 import com.example.ui.theme.GarvisTextMuted
@@ -125,10 +122,10 @@ fun GarvisAppScreen(
   val isListening by vm.speechManager.isListening.collectAsState()
   val partialSpeech by vm.speechManager.partialText.collectAsState()
   val showDiagnostics by vm.showDiagnosticsDialog.collectAsState()
+  val showWorldRadar by vm.showWorldRadarDialog.collectAsState()
 
   var inputText by remember { mutableStateOf("") }
 
-  // Audio permission launcher
   val audioPermissionLauncher = rememberLauncherForActivityResult(
     contract = ActivityResultContracts.RequestPermission()
   ) { isGranted ->
@@ -137,7 +134,7 @@ fun GarvisAppScreen(
     } else {
       Toast.makeText(
         context,
-        "Microphone permission required for voice recognition, Sir.",
+        "اعطينا إذن الميكروفون باش نقدر نسمعك يا خويا",
         Toast.LENGTH_LONG
       ).show()
     }
@@ -160,6 +157,16 @@ fun GarvisAppScreen(
     DiagnosticsDialog(onDismiss = { vm.dismissDiagnostics() })
   }
 
+  // World Events Radar Dialog
+  if (showWorldRadar) {
+    WorldPulseDialog(
+      onDismiss = { vm.dismissWorldRadar() },
+      onSpeakEvent = { eventText ->
+        vm.reSpeakMessage(eventText)
+      }
+    )
+  }
+
   Scaffold(
     modifier = Modifier.fillMaxSize(),
     containerColor = GarvisDarkBackground,
@@ -171,9 +178,9 @@ fun GarvisAppScreen(
         .background(
           brush = Brush.verticalGradient(
             colors = listOf(
-              Color(0xFF090D17),
-              Color(0xFF070B14),
-              Color(0xFF05080F)
+              Color(0xFF17080B),
+              Color(0xFF0F0608),
+              Color(0xFF0A0405)
             )
           )
         )
@@ -201,7 +208,7 @@ fun GarvisAppScreen(
 
         Spacer(modifier = Modifier.height(6.dp))
 
-        // 2. Central Arc Reactor
+        // 2. Central Red Arc Reactor
         Box(
           modifier = Modifier
             .fillMaxWidth()
@@ -220,21 +227,21 @@ fun GarvisAppScreen(
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            // Reactor Status Subtext
+            // Reactor Status Subtext in Algerian Darija
             val statusHint = when (status) {
-              GarvisStatus.LISTENING -> if (isArabic) "جاري الاستماع... تفضل يا سيدي" else "LISTENING... SPEAK DIRECTIVE, SIR"
-              GarvisStatus.PROCESSING -> if (isArabic) "جاري المعالجة والتحليل العصبي..." else "NEURAL CLOUD PROCESSING DIRECTIVE..."
-              GarvisStatus.SPEAKING -> if (isArabic) "جارفيس يتحدث..." else "GARVIS TRANSMITTING AUDIO SYNTHESIS..."
-              else -> if (isArabic) "انقر على المفاعل أو تحدث بالأوامر" else "TAP REACTOR OR MIC TO COMMAND"
+              GarvisStatus.LISTENING -> "● راني نسمع فيك مليح... اهدر يا خويا!"
+              GarvisStatus.PROCESSING -> "⟳ راني نخمم ونحلل فالأمر تاعك..."
+              GarvisStatus.SPEAKING -> "▲ راني نجاوب فيك بالصوت يا صاحبي..."
+              else -> "انقر على مفاعل القوس الأحمر باش تهدر معايا"
             }
             Text(
               text = statusHint,
               color = when (status) {
                 GarvisStatus.LISTENING -> GarvisGreen
-                GarvisStatus.PROCESSING -> GarvisAmber
-                else -> GarvisCyan.copy(alpha = 0.8f)
+                GarvisStatus.PROCESSING -> GarvisGold
+                else -> GarvisRedBright
               },
-              fontSize = 9.sp,
+              fontSize = 10.sp,
               fontWeight = FontWeight.Bold,
               fontFamily = FontFamily.Monospace,
               letterSpacing = 0.8.sp
@@ -248,12 +255,14 @@ fun GarvisAppScreen(
               rmsAudioLevel = rmsAudioLevel
             )
 
-            // Quick Directive Suggestion Chips
-            val quickPrompts = if (isArabic) {
-              listOf("تقرير الحالة", "فحص الأنظمة", "تشغيل المصباح", "من أنت؟")
-            } else {
-              listOf("Status Report", "Diagnostics", "Toggle Torch", "Who are you?")
-            }
+            // Quick Directive Suggestion Chips in Algerian Darija
+            val quickPrompts = listOf(
+              "واش صاري فالعالم؟ 🌍",
+              "حل هاد التمرين 📚",
+              "شعل الفلاش 🔦",
+              "دير فحص شامل 🛡️",
+              "شكون انت يا جارفيز؟ 🤖"
+            )
 
             FlowRow(
               modifier = Modifier.padding(top = 2.dp),
@@ -264,17 +273,17 @@ fun GarvisAppScreen(
                   modifier = Modifier
                     .padding(horizontal = 4.dp, vertical = 2.dp)
                     .clip(RoundedCornerShape(6.dp))
-                    .background(Color(0xFF0F1A2D))
-                    .border(1.dp, GarvisCyan.copy(alpha = 0.3f), RoundedCornerShape(6.dp))
+                    .background(Color(0xFF260D12))
+                    .border(1.dp, GarvisRed.copy(alpha = 0.5f), RoundedCornerShape(6.dp))
                     .clickable { vm.processUserPrompt(prompt) }
-                    .padding(horizontal = 8.dp, vertical = 3.dp)
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
                   Text(
                     text = prompt,
-                    color = GarvisCyan,
-                    fontSize = 9.sp,
+                    color = GarvisGold,
+                    fontSize = 10.sp,
                     fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Bold
                   )
                 }
               }
@@ -284,13 +293,13 @@ fun GarvisAppScreen(
 
         Spacer(modifier = Modifier.height(4.dp))
 
-        // 3. Quick Action Command Center
+        // 3. Quick Action Command Center (Torch, World Radar, Homework, Diagnostics, Mute)
         QuickActionPanel(
           isFlashlightOn = isFlashlightOn,
           onToggleFlashlight = { vm.toggleTorch() },
+          onOpenWorldRadar = { vm.openWorldRadar() },
+          onSolveExercise = { vm.triggerSolveExerciseMode() },
           onRunDiagnostics = { vm.runDiagnostics() },
-          onOpenAlarm = { vm.openAlarm() },
-          onOpenCalendar = { vm.openCalendar() },
           isMuted = isMuted,
           onToggleMute = { vm.toggleMute() }
         )
@@ -326,7 +335,7 @@ fun GarvisAppScreen(
             onValueChange = { inputText = it },
             placeholder = {
               Text(
-                text = if (isArabic) "اكتب أو تحدث بالأمر يا سيدي..." else "Speak or enter directive, Sir…",
+                text = "اهدر ولا اكتبلي واش تحب يا خويا…",
                 color = GarvisTextMuted,
                 fontSize = 11.sp,
                 fontFamily = FontFamily.Monospace
@@ -337,13 +346,13 @@ fun GarvisAppScreen(
               .testTag("directive_input_field"),
             shape = RoundedCornerShape(10.dp),
             colors = OutlinedTextFieldDefaults.colors(
-              focusedContainerColor = Color(0xFF0B1324),
-              unfocusedContainerColor = Color(0xFF090F1C),
-              focusedBorderColor = GarvisCyan,
+              focusedContainerColor = Color(0xFF1A0A0E),
+              unfocusedContainerColor = Color(0xFF14070A),
+              focusedBorderColor = GarvisRed,
               unfocusedBorderColor = GarvisSurfaceBorder,
               focusedTextColor = GarvisTextPrimary,
               unfocusedTextColor = GarvisTextPrimary,
-              cursorColor = GarvisCyan
+              cursorColor = GarvisRed
             ),
             singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
@@ -361,7 +370,7 @@ fun GarvisAppScreen(
 
           Spacer(modifier = Modifier.width(6.dp))
 
-          // Send Text Button
+          // Send Button
           if (inputText.isNotBlank()) {
             IconButton(
               onClick = {
@@ -373,19 +382,19 @@ fun GarvisAppScreen(
               modifier = Modifier
                 .size(46.dp)
                 .clip(RoundedCornerShape(10.dp))
-                .background(GarvisCyanDark)
-                .border(1.dp, GarvisCyan, RoundedCornerShape(10.dp))
+                .background(GarvisRedDark)
+                .border(1.dp, GarvisRed, RoundedCornerShape(10.dp))
                 .testTag("send_directive_button")
             ) {
               Icon(
                 imageVector = Icons.AutoMirrored.Filled.Send,
                 contentDescription = "Send",
-                tint = GarvisCyan,
+                tint = GarvisGold,
                 modifier = Modifier.size(20.dp)
               )
             }
           } else {
-            // Central Glowing Mic Button
+            // Glowing Red Mic Button
             val infiniteTransition = rememberInfiniteTransition(label = "MicPulse")
             val micGlow by infiniteTransition.animateFloat(
               initialValue = 0.5f,
@@ -402,10 +411,10 @@ fun GarvisAppScreen(
               modifier = Modifier
                 .size(46.dp)
                 .clip(RoundedCornerShape(10.dp))
-                .background(if (isListening) Color(0xFF003847) else GarvisSurfaceVariant)
+                .background(if (isListening) GarvisRedDark else GarvisSurfaceVariant)
                 .border(
                   width = if (isListening) 2.dp else 1.dp,
-                  color = if (isListening) GarvisCyan.copy(alpha = micGlow) else GarvisCyan.copy(alpha = 0.5f),
+                  color = if (isListening) GarvisRed.copy(alpha = micGlow) else GarvisRed.copy(alpha = 0.6f),
                   shape = RoundedCornerShape(10.dp)
                 )
                 .testTag("mic_button")
@@ -413,7 +422,7 @@ fun GarvisAppScreen(
               Icon(
                 imageVector = if (isListening) Icons.Default.MicOff else Icons.Default.Mic,
                 contentDescription = if (isListening) "Stop Listening" else "Start Listening",
-                tint = if (isListening) GarvisCyan else GarvisTextPrimary,
+                tint = if (isListening) GarvisGold else GarvisRedBright,
                 modifier = Modifier.size(22.dp)
               )
             }

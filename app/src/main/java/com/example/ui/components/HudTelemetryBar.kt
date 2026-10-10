@@ -44,10 +44,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.device.MemoryInfoData
-import com.example.ui.theme.GarvisAmber
-import com.example.ui.theme.GarvisCyan
+import com.example.ui.theme.GarvisGold
 import com.example.ui.theme.GarvisGreen
 import com.example.ui.theme.GarvisRed
+import com.example.ui.theme.GarvisRedBright
 import com.example.ui.theme.GarvisSurfaceBorder
 import com.example.ui.theme.GarvisSurfaceVariant
 import com.example.ui.theme.GarvisTextMuted
@@ -100,7 +100,7 @@ fun HudTelemetryBar(
   Column(
     modifier = modifier
       .fillMaxWidth()
-      .background(Color(0xFF0B1220).copy(alpha = 0.9f))
+      .background(Color(0xFF14070A).copy(alpha = 0.95f))
       .border(1.dp, GarvisSurfaceBorder, RoundedCornerShape(12.dp))
       .padding(horizontal = 14.dp, vertical = 10.dp)
   ) {
@@ -110,19 +110,19 @@ fun HudTelemetryBar(
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.CenterVertically
     ) {
-      // Left: Real-time clock & stardate HUD tag
+      // Left: Real-time clock & Algerian Garvis tag
       Row(verticalAlignment = Alignment.CenterVertically) {
         Column {
           Text(
-            text = "STARK T-NET // $currentTime",
-            color = GarvisCyan,
+            text = "GARVIS DZ // $currentTime",
+            color = GarvisRedBright,
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
             fontFamily = FontFamily.Monospace,
             letterSpacing = 1.sp
           )
           Text(
-            text = "SYS: GARVIS v4.2 // NOMINAL",
+            text = "صاحبك الذكي // أنظمة المفاعل 100%",
             color = GarvisTextMuted,
             fontSize = 9.sp,
             fontFamily = FontFamily.Monospace
@@ -130,20 +130,20 @@ fun HudTelemetryBar(
         }
       }
 
-      // Center: Status Badge with blinking neon LED
+      // Center: Status Badge with blinking red LED
       val (statusColor, statusLabel) = when (status) {
-        GarvisStatus.ONLINE -> Pair(GarvisGreen, "ONLINE")
-        GarvisStatus.STANDBY -> Pair(GarvisCyan, "STANDBY")
-        GarvisStatus.LISTENING -> Pair(GarvisCyan, "LISTENING")
-        GarvisStatus.PROCESSING -> Pair(GarvisAmber, "PROCESSING")
-        GarvisStatus.SPEAKING -> Pair(GarvisCyan, "SPEAKING")
+        GarvisStatus.ONLINE -> Pair(GarvisGreen, if (isArabic) "متصل" else "ONLINE")
+        GarvisStatus.STANDBY -> Pair(GarvisGold, if (isArabic) "جاهز" else "STANDBY")
+        GarvisStatus.LISTENING -> Pair(GarvisRedBright, if (isArabic) "يسمع" else "LISTENING")
+        GarvisStatus.PROCESSING -> Pair(GarvisGold, if (isArabic) "يحلل" else "PROCESSING")
+        GarvisStatus.SPEAKING -> Pair(GarvisRed, if (isArabic) "يهدر" else "SPEAKING")
       }
 
       Row(
         modifier = Modifier
           .clip(RoundedCornerShape(6.dp))
           .background(GarvisSurfaceVariant)
-          .border(1.dp, statusColor.copy(alpha = 0.6f), RoundedCornerShape(6.dp))
+          .border(1.dp, statusColor.copy(alpha = 0.7f), RoundedCornerShape(6.dp))
           .padding(horizontal = 8.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
       ) {
@@ -164,13 +164,13 @@ fun HudTelemetryBar(
         )
       }
 
-      // Right: Language Switcher (EN / AR)
+      // Right: Language Switcher (DZ الدارجة / EN)
       Row(
         modifier = Modifier
           .testTag("language_toggle_button")
           .clip(RoundedCornerShape(6.dp))
-          .background(Color(0xFF0F1A2E))
-          .border(1.dp, GarvisCyan.copy(alpha = 0.4f), RoundedCornerShape(6.dp))
+          .background(Color(0xFF260D12))
+          .border(1.dp, GarvisRed.copy(alpha = 0.5f), RoundedCornerShape(6.dp))
           .clickable { onToggleLanguage() }
           .padding(horizontal = 8.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -178,12 +178,12 @@ fun HudTelemetryBar(
         Icon(
           imageVector = Icons.Default.Translate,
           contentDescription = "Language Switch",
-          tint = GarvisCyan,
+          tint = GarvisGold,
           modifier = Modifier.size(13.dp)
         )
         Spacer(modifier = Modifier.width(4.dp))
         Text(
-          text = if (isArabic) "AR" else "EN",
+          text = if (isArabic) "دارجة DZ" else "EN",
           color = GarvisTextPrimary,
           fontSize = 11.sp,
           fontWeight = FontWeight.Bold,
@@ -206,27 +206,26 @@ fun HudTelemetryBar(
         verticalAlignment = Alignment.CenterVertically
       ) {
         Text(
-          text = "RAM",
+          text = "الرام RAM",
           color = GarvisTextSecondary,
           fontSize = 9.sp,
           fontFamily = FontFamily.Monospace,
           fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.width(6.dp))
-        // Progress bar
         Box(
           modifier = Modifier
             .weight(1f)
             .height(5.dp)
             .clip(RoundedCornerShape(3.dp))
-            .background(Color(0xFF142033))
+            .background(Color(0xFF241016))
         ) {
           Box(
             modifier = Modifier
               .fillMaxWidth(fraction = (memoryInfo.percentage / 100f).coerceIn(0.1f, 1f))
               .height(5.dp)
               .clip(RoundedCornerShape(3.dp))
-              .background(if (memoryInfo.percentage > 85) GarvisRed else GarvisCyan)
+              .background(if (memoryInfo.percentage > 85) GarvisGold else GarvisRed)
           )
         }
         Spacer(modifier = Modifier.width(6.dp))
@@ -249,8 +248,8 @@ fun HudTelemetryBar(
         }
         val batteryColor = when {
           isCharging -> GarvisGreen
-          batteryLevel < 20 -> GarvisRed
-          else -> GarvisCyan
+          batteryLevel < 20 -> GarvisGold
+          else -> GarvisRedBright
         }
 
         Icon(
@@ -261,7 +260,7 @@ fun HudTelemetryBar(
         )
         Spacer(modifier = Modifier.width(4.dp))
         Text(
-          text = "PWR $batteryLevel%",
+          text = "البطارية $batteryLevel%",
           color = batteryColor,
           fontSize = 10.sp,
           fontFamily = FontFamily.Monospace,

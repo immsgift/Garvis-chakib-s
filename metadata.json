@@ -1,6 +1,6 @@
 {
   "name": "Garvis",
-  "description": "Futuristic Iron Man-inspired AI voice assistant with holographic Arc Reactor and device telemetry",
+  "description": "المساعد الذكي الجزائري جارفيز - صاحبك الذكي بالدارجة الجزائرية، يحل التمارين، يوريلك واش صاري فالعالم بمفاعل ستارك الأحمر المتطور",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

@@ -6,7 +6,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
@@ -44,10 +42,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.example.ui.theme.GarvisAmber
-import com.example.ui.theme.GarvisCyan
+import com.example.ui.theme.GarvisGold
 import com.example.ui.theme.GarvisGreen
-import com.example.ui.theme.GarvisSurfaceBorder
+import com.example.ui.theme.GarvisRed
+import com.example.ui.theme.GarvisRedBright
 import com.example.ui.theme.GarvisTextMuted
 import com.example.ui.theme.GarvisTextPrimary
 import com.example.ui.theme.GarvisTextSecondary
@@ -65,11 +63,11 @@ fun DiagnosticsDialog(
 ) {
   val steps = remember {
     mutableStateListOf(
-      DiagnosticStep("ARC REACTOR CORE", "Flux: 100% // Palladium containment intact"),
-      DiagnosticStep("NEURAL INTELLIGENCE MATRIX", "Gemini 3.5 Flash pipeline ready // 4ms latency"),
-      DiagnosticStep("PHOTONIC ILLUMINATION EMITTER", "Camera torch hardware synchronized"),
-      DiagnosticStep("ENERGY TELEMETRY BUS", "Battery cell voltage nominal"),
-      DiagnosticStep("AUDIO & SPEECH TRANSLATOR", "Dual-stream English / Arabic engines calibrated")
+      DiagnosticStep("مفاعل القوس الأحمر ARC REACTOR", "الطاقة: 100% // الاحتواء النانوي مستقر تماماً"),
+      DiagnosticStep("الشبكة العصبية الذكية GEMINI AI", "نموذج الذكاء الاصطناعي متصل ومستعد لحل أي تمرين"),
+      DiagnosticStep("نظام الإضاءة الضوئي PHOTONIC TORCH", "مصباح الكاميرا متزامن وجاهز للتشغيل"),
+      DiagnosticStep("وحدة مراقبة طاقة البطارية", "خلايا الطاقة متوازنة واستهلاك التيليفون ممتاز"),
+      DiagnosticStep("محرك الصوت الجزائري DARIJA SPEECH", "معالج النطق الجزائري والصوت الطبيعي جاهز")
     )
   }
 
@@ -82,7 +80,7 @@ fun DiagnosticsDialog(
 
   LaunchedEffect(Unit) {
     for (i in steps.indices) {
-      delay(400)
+      delay(380)
       steps[i] = steps[i].copy(isDone = true)
       progress = (i + 1).toFloat() / steps.size
     }
@@ -93,8 +91,8 @@ fun DiagnosticsDialog(
       modifier = Modifier
         .fillMaxWidth()
         .clip(RoundedCornerShape(16.dp))
-        .background(Color(0xFF090E1A))
-        .border(1.5.dp, GarvisCyan, RoundedCornerShape(16.dp))
+        .background(Color(0xFF0F0608))
+        .border(1.5.dp, GarvisRed, RoundedCornerShape(16.dp))
         .padding(18.dp)
         .testTag("diagnostics_dialog")
     ) {
@@ -106,15 +104,14 @@ fun DiagnosticsDialog(
       ) {
         Column {
           Text(
-            text = "STARK SYSTEM AUDIT",
-            color = GarvisCyan,
+            text = "فحص أنظمة التيليفون والمفاعل",
+            color = GarvisRedBright,
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily.Monospace,
-            letterSpacing = 1.sp
+            fontFamily = FontFamily.Monospace
           )
           Text(
-            text = "PROTOCOL MARK-VII DIAGNOSTICS",
+            text = "تشخيص شامل لكل المكونات يا خويا",
             color = GarvisTextMuted,
             fontSize = 9.sp,
             fontFamily = FontFamily.Monospace
@@ -134,20 +131,18 @@ fun DiagnosticsDialog(
 
       Spacer(modifier = Modifier.height(14.dp))
 
-      // Progress bar
       LinearProgressIndicator(
         progress = { animatedProgress },
         modifier = Modifier
           .fillMaxWidth()
           .height(6.dp)
           .clip(RoundedCornerShape(3.dp)),
-        color = if (progress >= 1f) GarvisGreen else GarvisCyan,
-        trackColor = Color(0xFF142033),
+        color = if (progress >= 1f) GarvisGreen else GarvisRed,
+        trackColor = Color(0xFF260D12),
       )
 
       Spacer(modifier = Modifier.height(14.dp))
 
-      // Diagnostic Items
       Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         steps.forEach { step ->
           Row(
@@ -157,7 +152,7 @@ fun DiagnosticsDialog(
             Icon(
               imageVector = if (step.isDone) Icons.Default.CheckCircle else Icons.Default.Warning,
               contentDescription = null,
-              tint = if (step.isDone) GarvisGreen else GarvisAmber,
+              tint = if (step.isDone) GarvisGreen else GarvisGold,
               modifier = Modifier.size(16.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
@@ -182,15 +177,14 @@ fun DiagnosticsDialog(
 
       Spacer(modifier = Modifier.height(18.dp))
 
-      // Bottom Status & Close Button
       Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
       ) {
         Text(
-          text = if (progress >= 1f) "ALL SYSTEMS NOMINAL" else "SCANNING SUBSYSTEMS...",
-          color = if (progress >= 1f) GarvisGreen else GarvisCyan,
+          text = if (progress >= 1f) "كلش يمشي 100% يا صاحبي" else "جاري الفحص السريع...",
+          color = if (progress >= 1f) GarvisGreen else GarvisGold,
           fontSize = 10.sp,
           fontWeight = FontWeight.Bold,
           fontFamily = FontFamily.Monospace
@@ -199,14 +193,14 @@ fun DiagnosticsDialog(
         Button(
           onClick = onDismiss,
           colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFF11223A),
-            contentColor = GarvisCyan
+            containerColor = GarvisRed,
+            contentColor = Color.White
           ),
           shape = RoundedCornerShape(8.dp),
           modifier = Modifier.height(36.dp)
         ) {
           Text(
-            text = "CONFIRM",
+            text = "تم التأكيد",
             fontSize = 11.sp,
             fontFamily = FontFamily.Monospace,
             fontWeight = FontWeight.Bold

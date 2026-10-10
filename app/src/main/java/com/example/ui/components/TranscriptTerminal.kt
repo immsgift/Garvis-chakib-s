@@ -4,8 +4,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -33,7 +31,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -47,14 +44,14 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ui.theme.GarvisCyan
-import com.example.ui.theme.GarvisCyanSoft
+import com.example.ui.theme.GarvisGold
 import com.example.ui.theme.GarvisGreen
+import com.example.ui.theme.GarvisRed
+import com.example.ui.theme.GarvisRedBright
+import com.example.ui.theme.GarvisRedSoft
 import com.example.ui.theme.GarvisSurfaceBorder
-import com.example.ui.theme.GarvisSurfaceVariant
 import com.example.ui.theme.GarvisTextMuted
 import com.example.ui.theme.GarvisTextPrimary
-import com.example.ui.theme.GarvisTextSecondary
 import kotlinx.coroutines.delay
 
 data class TranscriptMessage(
@@ -77,7 +74,6 @@ fun TranscriptTerminal(
   val listState = rememberLazyListState()
   val context = LocalContext.current
 
-  // Auto-scroll to bottom when new messages arrive
   LaunchedEffect(messages.size, partialSpeech) {
     if (messages.isNotEmpty()) {
       listState.animateScrollToItem(messages.size - 1)
@@ -88,14 +84,14 @@ fun TranscriptTerminal(
     modifier = modifier
       .fillMaxWidth()
       .clip(RoundedCornerShape(12.dp))
-      .background(Color(0xFF070B14).copy(alpha = 0.95f))
+      .background(Color(0xFF0D0608).copy(alpha = 0.95f))
       .border(1.dp, GarvisSurfaceBorder, RoundedCornerShape(12.dp))
   ) {
     // Terminal Top Header Bar
     Row(
       modifier = Modifier
         .fillMaxWidth()
-        .background(Color(0xFF0D1628))
+        .background(Color(0xFF1C0A0E))
         .padding(horizontal = 12.dp, vertical = 8.dp),
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.CenterVertically
@@ -104,16 +100,16 @@ fun TranscriptTerminal(
         Box(
           modifier = Modifier
             .size(8.dp)
-            .background(GarvisCyan, RoundedCornerShape(2.dp))
+            .background(GarvisRedBright, RoundedCornerShape(2.dp))
         )
         Spacer(modifier = Modifier.width(6.dp))
         Text(
-          text = "NEURAL LOG // TRANSCRIPT STREAM",
-          color = GarvisCyan,
+          text = "سجل المحادثة مع جارفيز // CONVERSATION FEED",
+          color = GarvisRedBright,
           fontSize = 10.sp,
           fontWeight = FontWeight.Bold,
           fontFamily = FontFamily.Monospace,
-          letterSpacing = 1.sp
+          letterSpacing = 0.8.sp
         )
       }
 
@@ -147,12 +143,11 @@ fun TranscriptTerminal(
           onCopy = {
             val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             clipboard.setPrimaryClip(ClipData.newPlainText("Garvis Log", msg.text))
-            Toast.makeText(context, "Copied to clipboard", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "تم النسخ بنجاح يا خويا", Toast.LENGTH_SHORT).show()
           }
         )
       }
 
-      // Live voice recognition subtitle chip
       if (isListening && partialSpeech.isNotBlank()) {
         item {
           LivePartialCard(partialSpeech = partialSpeech)
@@ -169,10 +164,9 @@ private fun TerminalMessageCard(
   onCopy: () -> Unit
 ) {
   val isGarvis = message.sender == "GARVIS"
-  val tagColor = if (isGarvis) GarvisCyan else GarvisGreen
-  val label = if (isGarvis) "GARVIS // CORE" else "DIRECTIVE // USER"
+  val tagColor = if (isGarvis) GarvisRedBright else GarvisGold
+  val label = if (isGarvis) "جارفيز // GARVIS" else "خويا العزيز // YOU"
 
-  // Typewriter effect for live typing Garvis message
   var displayedText by remember(message.id) { mutableStateOf(if (message.isLiveTyping) "" else message.text) }
   var isTypingDone by remember(message.id) { mutableStateOf(!message.isLiveTyping) }
 
@@ -183,7 +177,7 @@ private fun TerminalMessageCard(
       while (currentLen <= full.length) {
         displayedText = full.take(currentLen)
         currentLen += 2
-        delay(18)
+        delay(16)
       }
       displayedText = full
       isTypingDone = true
@@ -197,15 +191,14 @@ private fun TerminalMessageCard(
     modifier = Modifier
       .fillMaxWidth()
       .clip(RoundedCornerShape(8.dp))
-      .background(if (isGarvis) Color(0xFF0A1424) else Color(0xFF0F1B24))
+      .background(if (isGarvis) Color(0xFF1A0A0E) else Color(0xFF220E13))
       .border(
         1.dp,
-        if (isGarvis) GarvisCyan.copy(alpha = 0.35f) else GarvisGreen.copy(alpha = 0.25f),
+        if (isGarvis) GarvisRed.copy(alpha = 0.4f) else GarvisGold.copy(alpha = 0.35f),
         RoundedCornerShape(8.dp)
       )
       .padding(10.dp)
   ) {
-    // Header with tag & timestamp & action buttons
     Row(
       modifier = Modifier.fillMaxWidth(),
       horizontalArrangement = Arrangement.SpaceBetween,
@@ -215,7 +208,7 @@ private fun TerminalMessageCard(
         Text(
           text = label,
           color = tagColor,
-          fontSize = 9.sp,
+          fontSize = 10.sp,
           fontWeight = FontWeight.Bold,
           fontFamily = FontFamily.Monospace,
           letterSpacing = 0.8.sp
@@ -234,7 +227,7 @@ private fun TerminalMessageCard(
           Icon(
             imageVector = Icons.AutoMirrored.Filled.VolumeUp,
             contentDescription = "Speak Again",
-            tint = GarvisCyan.copy(alpha = 0.8f),
+            tint = GarvisRedBright.copy(alpha = 0.85f),
             modifier = Modifier
               .size(15.dp)
               .clickable { onReSpeak() }
@@ -255,12 +248,11 @@ private fun TerminalMessageCard(
 
     Spacer(modifier = Modifier.height(6.dp))
 
-    // Message body text
     Text(
       text = displayedText + if (!isTypingDone) " █" else "",
-      color = if (isGarvis) GarvisTextPrimary else GarvisCyanSoft,
+      color = if (isGarvis) GarvisTextPrimary else GarvisRedSoft,
       fontSize = 13.sp,
-      lineHeight = 19.sp,
+      lineHeight = 20.sp,
       fontFamily = FontFamily.Monospace
     )
   }
@@ -272,15 +264,15 @@ private fun LivePartialCard(partialSpeech: String) {
     modifier = Modifier
       .fillMaxWidth()
       .clip(RoundedCornerShape(8.dp))
-      .background(Color(0xFF132238))
-      .border(1.dp, GarvisCyan.copy(alpha = 0.6f), RoundedCornerShape(8.dp))
+      .background(Color(0xFF2B0C12))
+      .border(1.dp, GarvisRedBright.copy(alpha = 0.7f), RoundedCornerShape(8.dp))
       .padding(8.dp),
     verticalAlignment = Alignment.CenterVertically
   ) {
     Text(
-      text = "LISTENING: ",
-      color = GarvisCyan,
-      fontSize = 10.sp,
+      text = "نسمع فيك: ",
+      color = GarvisRedBright,
+      fontSize = 11.sp,
       fontWeight = FontWeight.Bold,
       fontFamily = FontFamily.Monospace
     )
