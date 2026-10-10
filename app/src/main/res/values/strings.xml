@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Garvis</string>
+    <string name="hud_status_online">ONLINE</string>
+    <string name="hud_status_standby">STANDBY</string>
+    <string name="hud_status_listening">LISTENING</string>
+    <string name="hud_status_processing">PROCESSING</string>
+    <string name="hud_status_speaking">SPEAKING</string>
+    <string name="garvis_prompt_placeholder">Speak or enter directive, Sir…</string>
+    <string name="garvis_initial_greeting">Garvis AI v4.2 systems initialized. Arc Reactor at 100% output. Standing by for your directives, Sir.</string>
+</resources>

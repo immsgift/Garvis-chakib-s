@@ -1,0 +1,6 @@
+{
+  "name": "Garvis",
+  "description": "Futuristic Iron Man-inspired AI voice assistant with holographic Arc Reactor and device telemetry",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

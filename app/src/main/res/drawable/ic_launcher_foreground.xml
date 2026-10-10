@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Outer Glow Ring -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#4000F0FF"
+        android:strokeWidth="5"
+        android:pathData="M54,26 A28,28 0 1,1 53.99,26" />
+
+    <!-- Main Outer Reactor Casing -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FF00F0FF"
+        android:strokeWidth="2.5"
+        android:pathData="M54,28 A26,26 0 1,1 53.99,28" />
+
+    <!-- 10 Inductor Coils around circumference (radius approx 26, center 54,54) -->
+    <!-- Coil 1: Top (54, 28) -->
+    <path
+        android:fillColor="#FF00F0FF"
+        android:pathData="M52,24 h4 v7 h-4 z" />
+    <!-- Coil 2: 36 deg -->
+    <path
+        android:fillColor="#FF00F0FF"
+        android:pathData="M68,29 l3.2,2.4 l-4.2,5.6 l-3.2,-2.4 z" />
+    <!-- Coil 3: 72 deg -->
+    <path
+        android:fillColor="#FF00F0FF"
+        android:pathData="M78,44 l1.8,3.6 l-6.6,3.2 l-1.8,-3.6 z" />
+    <!-- Coil 4: 108 deg -->
+    <path
+        android:fillColor="#FF00F0FF"
+        android:pathData="M78,60 l-1.8,3.6 l-6.6,-3.2 l1.8,-3.6 z" />
+    <!-- Coil 5: 144 deg -->
+    <path
+        android:fillColor="#FF00F0FF"
+        android:pathData="M68,75 l-3.2,2.4 l-4.2,-5.6 l3.2,-2.4 z" />
+    <!-- Coil 6: Bottom (54, 80) -->
+    <path
+        android:fillColor="#FF00F0FF"
+        android:pathData="M52,77 h4 v7 h-4 z" />
+    <!-- Coil 7: 216 deg -->
+    <path
+        android:fillColor="#FF00F0FF"
+        android:pathData="M36,75 l-3.2,-2.4 l4.2,-5.6 l3.2,2.4 z" />
+    <!-- Coil 8: 252 deg -->
+    <path
+        android:fillColor="#FF00F0FF"
+        android:pathData="M26,60 l1.8,-3.6 l6.6,3.2 l-1.8,3.6 z" />
+    <!-- Coil 9: 288 deg -->
+    <path
+        android:fillColor="#FF00F0FF"
+        android:pathData="M26,44 l-1.8,-3.6 l6.6,-3.2 l1.8,3.6 z" />
+    <!-- Coil 10: 324 deg -->
+    <path
+        android:fillColor="#FF00F0FF"
+        android:pathData="M36,29 l3.2,-2.4 l4.2,5.6 l-3.2,2.4 z" />
+
+    <!-- Intermediate Concentric Ring -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#CC00D4FF"
+        android:strokeWidth="1.6"
+        android:pathData="M54,36 A18,18 0 1,1 53.99,36" />
+
+    <!-- Inner Core Housing Ring -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FF80F5FF"
+        android:strokeWidth="2"
+        android:pathData="M54,42 A12,12 0 1,1 53.99,42" />
+
+    <!-- Inner Palladium/Vibranium Triangle Core -->
+    <path
+        android:fillColor="#FF00F0FF"
+        android:pathData="M54,45 L62,59 L46,59 Z" />
+
+    <!-- Center Bright Hotspot (Pure Luminescent White) -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M54,49 A5,5 0 1,1 53.99,49" />
+</vector>

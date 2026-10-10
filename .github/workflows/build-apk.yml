@@ -1,0 +1,57 @@
+name: Build & Release Android APK
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-apk:
+    name: Build Flutter Release APK
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+
+    steps:
+      # Step 1: Check out repository source code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Java 17 environment
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      # Step 3: Set up latest stable Flutter
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      # Step 4: Ensure executable permissions for gradlew if present
+      - name: Set execute permissions for gradlew
+        run: |
+          if [ -f android/gradlew ]; then chmod +x android/gradlew; fi
+          if [ -f gradlew ]; then chmod +x gradlew; fi
+
+      # Step 5: Install Flutter package dependencies
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Step 6: Build release APK
+      - name: Build APK (Release)
+        run: flutter build apk --release
+
+      # Step 7: Upload the generated release APK artifact
+      - name: Upload Release APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Imani-Release-APK
+          path: build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
+          retention-days: 30
